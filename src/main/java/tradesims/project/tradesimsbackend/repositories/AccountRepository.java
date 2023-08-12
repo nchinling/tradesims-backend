@@ -57,4 +57,33 @@ public class AccountRepository {
     
     }
 
+
+    public List<String> getPortfolioList(String accountId) {
+        List<String> portfolioSymbols=jdbcTemplate.queryForList(SELECT_SYMBOLS_BY_ACCOUNTID,String.class, accountId);
+        
+        return portfolioSymbols;
+        }
+
+    
+    //insert into portfolio and trades table
+    @Transactional(rollbackFor = AccountException.class)
+    public Trade saveToPortfolio(Trade trade){
+
+        // No need to insert new symbol into portfolio if symbol already exist
+        System.out.println(">>>>>>>>trade.getDatenew is>>>>>>" + trade.getDate());
+        
+    
+        jdbcTemplate.update(INSERT_INTO_PORTFOLIO, trade.getAccountId(), trade.getSymbol());
+
+        // String articleId = UUID.randomUUID().toString().substring(0, 8);
+        String portfolioId = jdbcTemplate.queryForObject(SELECT_PORTFOLIO_ID, String.class, trade.getAccountId(), trade.getSymbol());
+        //Insert into trades
+        jdbcTemplate.update(INSERT_TRADE, portfolioId, trade.getAccountId(), trade.getUsername(), 
+                                trade.getExchange(), trade.getSymbol(), trade.getStockName(),
+                                trade.getUnits(), trade.getDate(), trade.getPrice(), trade.getCurrency(), trade.getTotal()); 
+
+        return trade;
+    }
+  
+
 }

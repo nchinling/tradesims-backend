@@ -24,5 +24,21 @@ public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
     
   public static final String CHECK_ACCOUNTID_EXISTS = "SELECT COUNT(*) FROM accounts WHERE account_id = ?";
 
+  public static final String SELECT_SYMBOLS_BY_ACCOUNTID = "SELECT symbol FROM portfolio WHERE account_id = ?";
+
+  public static final String INSERT_INTO_PORTFOLIO = "insert ignore into portfolio(account_id, symbol) values (?, ?)";
+
+  public static final String SELECT_PORTFOLIO_ID ="SELECT id FROM portfolio WHERE account_id = ? AND symbol = ?";
+
+  public static final String INSERT_TRADE = """
+    
+  insert into trades(portfolio_id,account_id, username, exchange, symbol,  
+                    stock_name, units, buy_date, buy_price, currency, total)
+          values (?,?, ?, ?, ? ,?, ?,?,?,?,?);
+
+""";
+
+
 
 }
+

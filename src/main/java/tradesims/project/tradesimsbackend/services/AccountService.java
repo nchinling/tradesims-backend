@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tradesims.project.tradesimsbackend.models.Account;
+import tradesims.project.tradesimsbackend.models.Trade;
 import tradesims.project.tradesimsbackend.repositories.AccountRepository;
 
 
@@ -72,6 +73,28 @@ public class AccountService {
 
         } else {
             throw new AccountNotFoundException("Account not found for email: " + email);
+        }
+    }
+
+
+    public List<String> getPortfolioList(String accountId) {
+        System.out.println(">>>>>>>> I am in Service >>> getUserPortfolioList");
+        return accountRepo.getPortfolioList(accountId);
+    }
+
+
+    @Transactional(rollbackFor = AccountException.class)
+    public Trade saveToPortfolio(Trade trade) throws AccountException {
+        try {
+
+            Double total = trade.getUnits()*trade.getPrice();
+            trade.setTotal(total);
+    
+            return accountRepo.saveToPortfolio(trade);
+
+        } catch (DataIntegrityViolationException ex) {
+            String errorMessage = "An error occurred while saving. Please try again.";
+            throw new AccountException(errorMessage);
         }
     }
 

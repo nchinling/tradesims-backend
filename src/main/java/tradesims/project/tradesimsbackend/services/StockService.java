@@ -209,6 +209,9 @@ return stockRepo.getStocksList(exchange, filter, limit, skip);
 }
 
 
+
+
+
 public Portfolio getPortfolioData(String accountId, String symbol, String interval) throws IOException {
     System.out.println(">>>>>>>> I am in getPortfolioDataService>>>>>>");
     Optional<Stock> s;

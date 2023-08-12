@@ -1,8 +1,12 @@
 package tradesims.project.tradesimsbackend.controllers;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
+import java.util.List;
+import java.util.Locale;
 
 import javax.security.auth.login.AccountNotFoundException;
 
@@ -26,6 +30,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import tradesims.project.tradesimsbackend.models.Account;
+import tradesims.project.tradesimsbackend.models.Trade;
 import tradesims.project.tradesimsbackend.services.AccountException;
 import tradesims.project.tradesimsbackend.services.AccountService;
 
@@ -123,6 +128,99 @@ public class AccountController {
   
         return ResponseEntity.ok(resp.toString());
 
+    }
+
+
+    
+	@PostMapping(path="/savetoportfolio", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @ResponseBody
+	public ResponseEntity<String> saveToPortfolio(@RequestBody MultiValueMap<String, String> form) {
+
+        System.out.printf(">>> I am inside saveToPortfolio>>>>>\n");
+
+        String accountId = form.getFirst("account_id");
+        String username = form.getFirst("username");
+        String exchange = form.getFirst("exchange");
+        String stockName = form.getFirst("stockName");
+        String symbol = form.getFirst("symbol");
+        String currency = form.getFirst("currency");
+        Double units = Double.parseDouble(form.getFirst("units"));
+        Double price = Double.parseDouble(form.getFirst("price"));
+       
+        String date = form.getFirst("date");
+
+        System.out.println(">>> The accountId for update is >>>>>" + accountId);
+        System.out.println(">>> The username for update is >>>>>" + username);
+        System.out.println(">>> The price for update is >>>>>" + price);
+        System.out.println(">>> The date for update is >>>>>" + date);
+
+  // Extract the relevant parts of the date string
+    String formattedDateString = date.substring(0, 33);
+
+    // Parse the extracted date string
+    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", Locale.US);
+    ZonedDateTime zonedDateTime = ZonedDateTime.parse(formattedDateString, inputFormatter);
+
+    // Convert to LocalDate (ignoring time and timezone)
+    LocalDate loggedDate = zonedDateTime.toLocalDate();
+    
+        // For creation of new trade
+        Trade trade = new Trade(accountId, username, exchange, stockName, symbol, units, price, currency, loggedDate);
+ 
+        JsonObject resp = null;
+
+        try {
+            Trade savedTrade = accSvc.saveToPortfolio(trade);
+                resp = Json.createObjectBuilder()
+                .add("account_id", savedTrade.getAccountId())
+                .add("username", savedTrade.getUsername())
+                .add("exchange", savedTrade.getExchange())
+                .add("stockName", savedTrade.getStockName())
+                .add("symbol", savedTrade.getSymbol())
+                .add("units", savedTrade.getUnits())
+                .add("price", savedTrade.getPrice())
+                .add("date", savedTrade.getDate().toString())
+                .build();
+
+         System.out.printf(">>>Successfully saved to portfolio>>>>>\n");   
+
+        } catch (AccountException e) {
+            String errorMessage = e.getMessage();
+             System.out.printf(">>>Portfolio Exception occured>>>>>\n");   
+            resp = Json.createObjectBuilder()
+            .add("error", errorMessage)
+            .build();
+            
+     
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(resp.toString());
+        }
+
+        System.out.printf(">>>Sending back to portfolio client>>>>>\n");   
+        return ResponseEntity.ok(resp.toString());
+
+    }
+
+
+    @GetMapping(path="/portfolio", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> getPortfolioList(@RequestParam(required=true) String accountId) throws IOException{
+     
+        System.out.println("I am in getPortfolio server");
+        System.out.println(">>>>>>>>accountId in controller>>>>>" + accountId);
+       
+        JsonArrayBuilder arrBuilder = Json.createArrayBuilder();
+		List<String> userPortfolioList = accSvc.getPortfolioList(accountId);
+		userPortfolioList.stream()
+			.map(each -> Json.createObjectBuilder()
+						.add("symbol", each)
+
+						.build()
+			)
+			.forEach(json -> arrBuilder.add(json));
+
+		return ResponseEntity.ok(arrBuilder.build().toString());
+       
     }
 
 }
