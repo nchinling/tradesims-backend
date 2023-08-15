@@ -41,7 +41,7 @@ public class StockController {
     @GetMapping(path="/quote/stock")
     @ResponseBody
     public ResponseEntity<String> getStockData(@RequestParam(required=true) String symbol,
-    @RequestParam(defaultValue = "1day",required=false) String interval,
+    @RequestParam(defaultValue = "1min",required=false) String interval,
     @RequestParam(required=false) String username) throws IOException{
         // Integer num = weatherSvc.getWeather(city);
         System.out.println("I am in getStockData server");
@@ -64,6 +64,7 @@ public class StockController {
                 .add("high", stock.getHigh())
                 .add("low", stock.getLow())
                 .add("close", stock.getClose())
+                .add("real_time_price", stock.getLivePrice())
                 .add("previous_close", stock.getPreviousClose())
                 .add("volume", stock.getVolume())
                 .add("change", stock.getChange())
@@ -77,8 +78,14 @@ public class StockController {
         
         //Obtain from api
         Optional<Stock> s = stockSvc.getStockData(symbol, interval);
-        if (s.isPresent()) {
+        Optional<Stock> s2 = stockSvc.getLivePrice(symbol, interval);
+
+        if (s.isPresent() && s2.isPresent()) {
             Stock stock = s.get();
+            Stock stock2 = s2.get();
+            stock.setLivePrice(stock2.getLivePrice());
+
+            System.out.println("The live price saved from API is " + stock.getLivePrice());
 
             //save stock data in redis/mongo for quick retrieval
             stockSvc.saveStockData(stock, interval);
@@ -94,6 +101,7 @@ public class StockController {
                 .add("high", stock.getHigh())
                 .add("low", stock.getLow())
                 .add("close", stock.getClose())
+                .add("real_time_price", stock.getLivePrice())
                 .add("previous_close", stock.getPreviousClose())
                 .add("volume", stock.getVolume())
                 .add("change", stock.getChange())
@@ -209,7 +217,7 @@ public class StockController {
     @GetMapping(path="/quote/portfolio")
     @ResponseBody
     public ResponseEntity<String> getPortfolioData(@RequestParam(required=true) String symbol,
-    @RequestParam(defaultValue = "1day",required=false) String interval,
+    @RequestParam(defaultValue = "1min",required=false) String interval,
     @RequestParam(required=false) String account_id) throws IOException{
         // Integer num = weatherSvc.getWeather(city);
         System.out.println("I am in getStockData server");

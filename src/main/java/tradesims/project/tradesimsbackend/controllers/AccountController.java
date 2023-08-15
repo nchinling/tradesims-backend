@@ -61,6 +61,7 @@ public class AccountController {
                 resp = Json.createObjectBuilder()
                 .add("account_id", loggedInAccount.getAccountId())
                 .add("username", loggedInAccount.getUsername())
+                .add("cash", loggedInAccount.getCash())
                 .add("timestamp", (new Date()).toString())
                 .build();
             } catch (AccountNotFoundException | IOException e) {
@@ -105,12 +106,29 @@ public class AccountController {
 
         try {
             Account registeredAccount = accSvc.createAccount(account);
+
+            Account loggedInAccount;
+            try {
+                loggedInAccount = accSvc.loginAccount(email, password);
                 resp = Json.createObjectBuilder()
-                .add("account_id", registeredAccount.getAccountId())
-                .add("username", registeredAccount.getUsername())
+                .add("account_id", loggedInAccount.getAccountId())
+                .add("username", loggedInAccount.getUsername())
+                .add("cash", loggedInAccount.getCash())
                 .add("timestamp", (new Date()).toString())
-                .add("status", "registered")
                 .build();
+            } catch (AccountNotFoundException e) {
+                String errorMessage = e.getMessage();
+                System.out.printf(">>>Account Exception occured>>>>>\n");   
+                resp = Json.createObjectBuilder()
+                .add("error", errorMessage)
+                .build();
+                
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(resp.toString());
+            } catch (IOException e) {
+            
+                e.printStackTrace();
+            }
 
          System.out.printf(">>>Successfully registered>>>>>\n");   
 

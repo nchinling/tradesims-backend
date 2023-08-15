@@ -55,6 +55,7 @@ public class StockRepository {
     public Optional<Stock> getStockFromRedis(String symbol, String interval) throws IOException{
       System.out.println(">>>>>getStockFromRedis stock>>>"+ symbol);
 
+        // String key = symbol+interval;
         String key = symbol+interval;
         String json = redisStockTemplate.opsForValue().get(key);
         System.out.println(">>>>>>>> json from Redis>>>>>>"+json);

@@ -6,7 +6,8 @@ public class Account {
     private String username;
     private String email;
     private String password;
-
+    private Double cash;
+    
     public Account() {
     }
 
@@ -16,6 +17,17 @@ public class Account {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    
+
+    public Account(String accountId, String name, String username, String email, String password, Double cash) {
+        this.accountId = accountId;
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.cash = cash;
     }
 
     public String getAccountId() {
@@ -58,10 +70,18 @@ public class Account {
         this.password = password;
     }
 
+    public Double getCash() {
+        return cash;
+    }
+
+    public void setCash(Double cash) {
+        this.cash = cash;
+    }
+
     @Override
     public String toString() {
         return "Account [accountId=" + accountId + ", name=" + name + ", username=" + username + ", email=" + email
-                + ", password=" + password + "]";
+                + ", password=" + password + ", cash=" + cash + "]";
     }
 
     

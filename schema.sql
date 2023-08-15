@@ -3,7 +3,8 @@ create table accounts(
     name VARCHAR(50) NOT NULL,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(50) NOT NULL
+    password VARCHAR(50) NOT NULL,
+    cash NUMERIC(15,2) DEFAULT 1000000
 );
 
 CREATE TABLE portfolio (

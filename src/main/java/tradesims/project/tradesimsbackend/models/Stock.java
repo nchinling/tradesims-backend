@@ -206,6 +206,7 @@ public class Stock {
             .add("high", this.getHigh())
             .add("low", this.getLow())
             .add("close", this.getClose())
+             .add("live_price", this.getLivePrice())
             .add("previous_close", this.getPreviousClose())
             .add("volume", this.getVolume())
             .add("change", this.getChange())
@@ -227,6 +228,7 @@ public class Stock {
             s.setHigh(o.getJsonNumber("high").doubleValue());
             s.setLow(o.getJsonNumber("low").doubleValue());
             s.setClose(o.getJsonNumber("close").doubleValue());
+            s.setLivePrice(o.getJsonNumber("live_price").doubleValue());
             s.setPreviousClose(o.getJsonNumber("previous_close").doubleValue());
             s.setVolume(o.getJsonNumber("volume").longValue());
             s.setChange(o.getJsonNumber("change").doubleValue());

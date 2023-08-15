@@ -1,5 +1,6 @@
 package tradesims.project.tradesimsbackend.repositories;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,6 +19,10 @@ public class AccountRowMapper implements RowMapper<Account> {
         account.setUsername(rs.getString("username"));
         account.setPassword(rs.getString("password"));
         account.setEmail(rs.getString("email"));
+        BigDecimal cash = rs.getBigDecimal("cash");
+        if (cash != null) {
+            account.setCash(cash.doubleValue()); 
+        }
         return account;
 
     }
