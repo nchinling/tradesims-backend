@@ -105,11 +105,11 @@ public class AccountController {
         JsonObject resp = null;
 
         try {
-            Account registeredAccount = accSvc.createAccount(account);
-
+            accSvc.createAccount(account);
             Account loggedInAccount;
             try {
                 loggedInAccount = accSvc.loginAccount(email, password);
+                 System.out.println(">>> The starting cash is >>>>>" + loggedInAccount.getCash());
                 resp = Json.createObjectBuilder()
                 .add("account_id", loggedInAccount.getAccountId())
                 .add("username", loggedInAccount.getUsername())

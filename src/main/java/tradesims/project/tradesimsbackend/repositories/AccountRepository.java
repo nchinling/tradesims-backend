@@ -72,6 +72,12 @@ public class AccountRepository {
         // No need to insert new symbol into portfolio if symbol already exist
         System.out.println(">>>>>>>>trade.getDatenew is>>>>>>" + trade.getDate());
         
+        Double cashTotal = jdbcTemplate.queryForObject(SELECT_ACCOUNT_BALANCE, Double.class, trade.getAccountId());
+        Double newCashTotal = cashTotal - trade.getTotal();
+        jdbcTemplate.update(UPDATE_ACCOUNT_BALANCE, newCashTotal, trade.getAccountId(
+
+        
+        ));
     
         jdbcTemplate.update(INSERT_INTO_PORTFOLIO, trade.getAccountId(), trade.getSymbol());
 

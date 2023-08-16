@@ -28,6 +28,10 @@ public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
 
   public static final String INSERT_INTO_PORTFOLIO = "insert ignore into portfolio(account_id, symbol) values (?, ?)";
 
+  public static final String SELECT_ACCOUNT_BALANCE ="SELECT cash FROM accounts WHERE account_id = ?";
+
+  public static final String UPDATE_ACCOUNT_BALANCE ="UPDATE accounts SET cash = ? WHERE account_id = ?";
+
   public static final String SELECT_PORTFOLIO_ID ="SELECT id FROM portfolio WHERE account_id = ? AND symbol = ?";
 
   public static final String INSERT_TRADE = """
