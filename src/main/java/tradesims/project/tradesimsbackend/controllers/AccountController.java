@@ -1,6 +1,8 @@
 package tradesims.project.tradesimsbackend.controllers;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -149,7 +151,6 @@ public class AccountController {
     }
 
 
-    
 	@PostMapping(path="/savetoportfolio", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
 	public ResponseEntity<String> saveToPortfolio(@RequestBody MultiValueMap<String, String> form) {
@@ -162,6 +163,7 @@ public class AccountController {
         String stockName = form.getFirst("stockName");
         String symbol = form.getFirst("symbol");
         String currency = form.getFirst("currency");
+        String action = form.getFirst("action");
         Double units = Double.parseDouble(form.getFirst("units"));
         Double price = Double.parseDouble(form.getFirst("price"));
        
@@ -183,7 +185,7 @@ public class AccountController {
     LocalDate loggedDate = zonedDateTime.toLocalDate();
     
         // For creation of new trade
-        Trade trade = new Trade(accountId, username, exchange, stockName, symbol, units, price, currency, loggedDate);
+        Trade trade = new Trade(accountId, username, exchange, stockName, symbol, units, price, currency, action, loggedDate);
  
         JsonObject resp = null;
 
@@ -239,6 +241,36 @@ public class AccountController {
 
 		return ResponseEntity.ok(arrBuilder.build().toString());
        
+    }
+
+
+    @DeleteMapping(path="/tradesList", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<String> deleteFromPortfolio(@RequestBody Trade deleteTradeJson) {
+
+    System.out.println(">>>>The symbol received is>>>" + deleteTradeJson.getSymbol() );
+    System.out.println(">>>>The accountId received is>>>" + deleteTradeJson.getAccountId());
+    System.out.println(">>>>The date received for delete is>>>" + deleteTradeJson.getDate());
+    // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    // Date date;
+    JsonObject resp= null;
+        // date = dateFormat.parse(sellDataJson.getDate());
+        Trade deletedTrade = accSvc.deleteTrade(deleteTradeJson);
+        resp = Json.createObjectBuilder()
+            // .add("symbol", deletedSymbol)
+            .add("symbol", deletedTrade.getSymbol())
+            .add("account_id", deletedTrade.getAccountId())
+            .add("username", deletedTrade.getUsername())
+            .add("currency", deletedTrade.getCurrency())
+            .add("exchange", deletedTrade.getExchange())
+            .add("stockName", deletedTrade.getStockName())
+            .add("units", deletedTrade.getUnits())
+            .add("price", deleteTradeJson.getPrice())
+            .add("date", deletedTrade.getDate().toString())
+            .build();
+
+        return ResponseEntity.ok(resp.toString());
+
     }
 
 }

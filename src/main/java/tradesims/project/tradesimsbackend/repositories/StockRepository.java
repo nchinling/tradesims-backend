@@ -15,11 +15,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import tradesims.project.tradesimsbackend.models.Stock;
 import tradesims.project.tradesimsbackend.models.StockInfo;
 import tradesims.project.tradesimsbackend.models.StockProfile;
+import tradesims.project.tradesimsbackend.models.Trade;
+
+import static tradesims.project.tradesimsbackend.repositories.DBQueries.*;
 
 @Repository    
 public class StockRepository {
@@ -31,7 +35,10 @@ public class StockRepository {
     private RedisTemplate<String, String> redisStockProfileTemplate;
 
     @Autowired
-	private MongoTemplate mongoTemplate;
+	  private MongoTemplate mongoTemplate;
+
+    @Autowired 
+    JdbcTemplate jdbcTemplate;
 
 
     public void saveStockData(Stock stock, String interval){
@@ -149,6 +156,12 @@ public class StockRepository {
 }
 
 
+    public List<Trade> getAllTradesData(String accountId){
+        return jdbcTemplate.query(SELECT_TRADES_BY_ACCOUNTID,  
+        new TradeRowMapper() , new Object[]{accountId});    
+    }
+
+
   private Integer convertIntervalToMinutes(String interval){
     int cookieTime = 0;
     switch (interval) {
@@ -170,5 +183,9 @@ public class StockRepository {
       }
     return cookieTime;
   }
+
+
+
+
 
 }

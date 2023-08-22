@@ -98,6 +98,13 @@ public class AccountService {
         }
     }
 
+
+    public Trade deleteTrade(Trade tradeToDelete) {
+        System.out.println(">>>>>>>> I am in Service >>> deleteTrade");
+        return accountRepo.deleteTrade(tradeToDelete);
+        // return tradeToDelete;
+    }
+
     
 }
 

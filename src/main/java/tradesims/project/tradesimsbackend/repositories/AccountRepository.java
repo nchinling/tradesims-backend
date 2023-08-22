@@ -47,7 +47,7 @@ public class AccountRepository {
 
     public Optional<Trade> getTradeData(String accountId, String symbol){
         List<Trade> trades = jdbcTemplate.query(SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL, 
-        new TradeRowMapper() , new Object[]{accountId, symbol});
+        new TotalTradeRowMapper() , new Object[]{accountId, symbol});
         
         if (!trades.isEmpty()) {
             return Optional.of(trades.get(0));
@@ -58,11 +58,18 @@ public class AccountRepository {
     }
 
 
+    public Double getTotalUnits(String accountId, String symbol) {
+        Double totalUnits=jdbcTemplate.queryForObject(SELECT_TOTAL_UNITS_BY_ACCOUNTID_AND_SYMBOL,Double.class, accountId, symbol);
+        
+        return totalUnits;
+    }
+
+
     public List<String> getPortfolioList(String accountId) {
         List<String> portfolioSymbols=jdbcTemplate.queryForList(SELECT_SYMBOLS_BY_ACCOUNTID,String.class, accountId);
         
         return portfolioSymbols;
-        }
+    }
 
     
     //insert into portfolio and trades table
@@ -79,17 +86,39 @@ public class AccountRepository {
         
         ));
     
-        jdbcTemplate.update(INSERT_INTO_PORTFOLIO, trade.getAccountId(), trade.getSymbol());
+        jdbcTemplate.update(INSERT_UPDATE_PORTFOLIO, trade.getAccountId(), trade.getSymbol(), trade.getUnits(), trade.getUnits());
 
         // String articleId = UUID.randomUUID().toString().substring(0, 8);
         String portfolioId = jdbcTemplate.queryForObject(SELECT_PORTFOLIO_ID, String.class, trade.getAccountId(), trade.getSymbol());
         //Insert into trades
         jdbcTemplate.update(INSERT_TRADE, portfolioId, trade.getAccountId(), trade.getUsername(), 
                                 trade.getExchange(), trade.getSymbol(), trade.getStockName(),
-                                trade.getUnits(), trade.getDate(), trade.getPrice(), trade.getCurrency(), trade.getTotal()); 
+                                trade.getUnits(), trade.getAction(), trade.getDate(), trade.getPrice(), trade.getCurrency(), trade.getTotal()); 
 
         return trade;
     }
+
+
+    public Trade deleteTrade(Trade tradeToSell) {
+
+        Double totalUnits=jdbcTemplate.queryForObject(SELECT_TOTAL_UNITS_BY_ACCOUNTID_AND_SYMBOL,Double.class, tradeToSell.getAccountId(), tradeToSell.getSymbol());
+       
+        if (totalUnits < tradeToSell.getUnits()){
+
+        }
+        else{
+
+            jdbcTemplate.update(DELETE_UNITS_FROM_PORTFOLIO_BY_ACCOUNTID_AND_SYMBOL, tradeToSell.getUnits(), tradeToSell.getSymbol(), tradeToSell.getAccountId());
+            jdbcTemplate.update(ADD_CASH_TO_ACCOUNT_BY_ACCOUNTID, tradeToSell.getUnits()*tradeToSell.getPrice(), tradeToSell.getAccountId());
+            String portfolioId = jdbcTemplate.queryForObject(SELECT_PORTFOLIO_ID, String.class, tradeToSell.getAccountId(), tradeToSell.getSymbol());
+            jdbcTemplate.update(INSERT_TRADE, portfolioId, tradeToSell.getAccountId(), tradeToSell.getUsername(), 
+                                tradeToSell.getExchange(), tradeToSell.getSymbol(), tradeToSell.getStockName(),
+                                tradeToSell.getUnits(), tradeToSell.getAction(), tradeToSell.getDate(), tradeToSell.getPrice(),tradeToSell.getCurrency(),tradeToSell.getUnits()*tradeToSell.getPrice());
+        }
+
+        return tradeToSell;
+    }
+
   
 
 }

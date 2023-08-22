@@ -209,23 +209,22 @@ return stockRepo.getStocksList(exchange, filter, limit, skip);
 }
 
 
-
-
-
 public Portfolio getPortfolioData(String accountId, String symbol, String interval) throws IOException {
     System.out.println(">>>>>>>> I am in getPortfolioDataService>>>>>>");
     Optional<Stock> s;
     Optional<Trade> t = accountRepo.getTradeData(accountId, symbol);
     Trade trade = t.get();
+    Double totalUnits = accountRepo.getTotalUnits(accountId, symbol);
 
     Stock stock;
         s = getLivePrice(symbol, interval);
         stock = s.get();
+    trade.setTotal(totalUnits*stock.getLivePrice());
 
-    Portfolio calculatedP = getCalculations(trade.getUnits(), stock.getLivePrice(),trade.getTotal());
+    Portfolio calculatedP = getCalculations(totalUnits, stock.getLivePrice(),trade.getTotal());
     System.out.println(">>>>The total percentage change is >>>>>" + calculatedP.getTotalPercentageChange() );
     Portfolio p = new Portfolio(trade.getAccountId(), trade.getSymbol(), trade.getStockName(),
-                    trade.getExchange(), trade.getCurrency(), trade.getUnits(), trade.getPrice(),trade.getTotal(),
+                    trade.getExchange(), trade.getCurrency(), totalUnits, trade.getPrice(),trade.getTotal(),
                     stock.getLivePrice(), calculatedP.getTotalCurrentPrice(), 
                     calculatedP.getTotalReturn(), calculatedP.getTotalPercentageChange(), LocalDate.now()  );
         System.out.println(">>> The stock price is>>>" + stock.getLivePrice());
@@ -260,6 +259,34 @@ public Portfolio getPortfolioData(String accountId, String symbol, String interv
 
     public void saveStockData(Stock stock, String interval){
         stockRepo.saveStockData(stock, interval);
+    }
+
+
+
+    
+    public List<Trade> getAllTradesData(String accountId) throws IOException {
+        System.out.println(">>>>>>>> I am in getPortfolioDataService>>>>>>");
+        Optional<Stock> s;
+     
+        List<Trade> allTrades = stockRepo.getAllTradesData(accountId);
+
+        
+        List<Trade> trades = new ArrayList<Trade>();
+        if (!allTrades.isEmpty()) {
+        for (Trade trade : allTrades) {
+
+            Trade eachTrade = new Trade(trade.getAccountId(), trade.getUsername(), trade.getExchange(), trade.getStockName(),
+            trade.getSymbol(),  trade.getUnits(),  trade.getPrice(), trade.getCurrency(),trade.getAction(), trade.getDate(),  trade.getTotal()
+            );
+
+            trades.add(eachTrade);
+        }
+        } else {
+            System.out.println("No trades found.");
+        }
+    
+        return trades;
+        
     }
     
 

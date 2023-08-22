@@ -27,6 +27,7 @@ import tradesims.project.tradesimsbackend.models.Portfolio;
 import tradesims.project.tradesimsbackend.models.Stock;
 import tradesims.project.tradesimsbackend.models.StockInfo;
 import tradesims.project.tradesimsbackend.models.StockProfile;
+import tradesims.project.tradesimsbackend.models.Trade;
 import tradesims.project.tradesimsbackend.services.StockService;
 
 @Controller
@@ -229,11 +230,13 @@ public class StockController {
         
             Portfolio portfolio = stockSvc.getPortfolioData(accountId, symbol, interval);
 
+
             //save portfolio data in redis/mongo for quick retrieval
             // stockSvc.saveStockData(stock, interval);
 
             System.out.println("Obtained portfolio data from API");
             System.out.println(">>>>>Portfolio stockname is>>>>" + portfolio.getStockName());
+            System.out.println(">>>>>Units after deletion is>>>>" + portfolio.getUnits());
 
             JsonObject resp = Json.createObjectBuilder()
                 .add("account_id", portfolio.getAccountId())
@@ -257,6 +260,44 @@ public class StockController {
             return ResponseEntity.ok(resp.toString());
 
     }
+
+
+    
+    @GetMapping(path="/allTrades")
+    @ResponseBody
+    public ResponseEntity<String> getAllTradesData(
+    @RequestParam(required=true) String account_id) throws IOException{
+        System.out.println("I am in allTrades server");
+        System.out.println(">>>>>>>>accountId in controller>>>>>" + account_id);
+
+        String accountId = account_id;
+        
+        List<Trade> trades = stockSvc.getAllTradesData(accountId);
+
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+        for (Trade trade : trades) {
+            JsonObjectBuilder tradesBuilder = Json.createObjectBuilder()
+            .add("account_id", trade.getAccountId())
+            .add("username", trade.getUsername())
+            .add("exchange", trade.getExchange())
+            .add("currency", trade.getCurrency())
+            .add("stockName", trade.getStockName())
+            .add("symbol", trade.getSymbol())
+            .add("units", trade.getUnits())
+            .add("price", trade.getPrice())
+            .add("total_price", trade.getTotal())
+            .add("action", trade.getAction())
+            .add("date", trade.getDate().toString());
+            
+            arrayBuilder.add(tradesBuilder);
+        }
+
+        JsonArray respArray = arrayBuilder.build();
+        System.out.println(">>>sending back jsonarray tradesResponse data.>>>>>Hooray: " + respArray);
+        return ResponseEntity.ok(respArray.toString());
+
+}
 
 
 

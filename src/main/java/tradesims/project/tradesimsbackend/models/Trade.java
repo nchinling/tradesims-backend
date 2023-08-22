@@ -12,6 +12,7 @@ public class Trade {
     private Double units;
     private Double price;
     private String currency;
+    private String action;
     private LocalDate date;
     private Double total;
 
@@ -30,8 +31,11 @@ public class Trade {
        
         this.date = date;
     }
-
     
+
+
+   
+
     public Trade(String accountId, String username, String exchange, String stockName, String symbol, Double units,
             Double price, String currency, LocalDate date) {
         this.accountId = accountId;
@@ -77,7 +81,39 @@ public class Trade {
         this.total = total;
     }
 
+     // Trade trade = new Trade(accountId, username, exchange, stockName, symbol, 
+     //units, price, currency, loggedDate);
 
+    public Trade(String accountId, String username, String exchange, String stockName, String symbol, Double units,
+            Double price, String currency, String action, LocalDate date) {
+        this.accountId = accountId;
+        this.username = username;
+        this.exchange = exchange;
+        this.stockName = stockName;
+        this.symbol = symbol;
+        this.units = units;
+        this.price = price;
+        this.currency = currency;
+        this.action = action;
+        this.date = date;
+    }
+
+    public Trade(String accountId, String username, String exchange, String stockName, String symbol, Double units,
+            Double price, String currency, String action, LocalDate date, Double total) {
+        this.accountId = accountId;
+        this.username = username;
+        this.exchange = exchange;
+        this.stockName = stockName;
+        this.symbol = symbol;
+        this.units = units;
+        this.price = price;
+        this.currency = currency;
+        this.action = action;
+        this.date = date;
+        this.total = total;
+    }
+
+    
 
     public String getAccountId() {
         return accountId;
@@ -144,12 +180,24 @@ public class Trade {
         this.currency = currency;
     }
 
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
     @Override
     public String toString() {
         return "Trade [accountId=" + accountId + ", username=" + username + ", exchange=" + exchange + ", stockName="
                 + stockName + ", symbol=" + symbol + ", units=" + units + ", price=" + price + ", currency=" + currency
-                + ", date=" + date + ", total=" + total + "]";
+                + ", action=" + action + ", date=" + date + ", total=" + total + "]";
     }
+
+
+    
 
 
     

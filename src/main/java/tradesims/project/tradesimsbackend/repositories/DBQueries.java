@@ -10,9 +10,8 @@ public class DBQueries {
 
 public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
     SELECT t.account_id, t.symbol, t.username, t.exchange, t.stock_name,
-    t.currency, SUM(t.units*t.buy_price)/SUM(t.units) as buy_price, 
-    SUM(t.total) AS total_sum, SUM(t.units) AS total_units, 
-    SUM(t.fee) AS total_fee
+    t.currency, SUM(t.units*t.price)/SUM(t.units) as buy_price, 
+    SUM(t.total) AS total_sum, SUM(t.units) AS total_units 
     FROM trades AS t
     RIGHT JOIN portfolio AS p ON t.portfolio_id = p.id
     WHERE t.account_id = ? AND t.symbol = ?
@@ -26,7 +25,12 @@ public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
 
   public static final String SELECT_SYMBOLS_BY_ACCOUNTID = "SELECT symbol FROM portfolio WHERE account_id = ?";
 
-  public static final String INSERT_INTO_PORTFOLIO = "insert ignore into portfolio(account_id, symbol) values (?, ?)";
+  public static final String SELECT_TRADES_BY_ACCOUNTID = "SELECT * FROM trades WHERE account_id = ? ORDER BY symbol";
+
+  public static final String SELECT_TOTAL_UNITS_BY_ACCOUNTID_AND_SYMBOL = "SELECT units FROM portfolio WHERE account_id = ? AND symbol = ?";
+
+  public static final String INSERT_UPDATE_PORTFOLIO = "insert into portfolio(account_id, symbol, units) values (?, ?, ?) on duplicate key update units = units + ?";
+
 
   public static final String SELECT_ACCOUNT_BALANCE ="SELECT cash FROM accounts WHERE account_id = ?";
 
@@ -37,10 +41,18 @@ public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
   public static final String INSERT_TRADE = """
     
   insert into trades(portfolio_id,account_id, username, exchange, symbol,  
-                    stock_name, units, buy_date, buy_price, currency, total)
-          values (?,?, ?, ?, ? ,?, ?,?,?,?,?);
+                    stock_name, units, action, trade_date, price, currency, total)
+          values (?,?, ?, ?, ? ,?, ?,?,?,?,?,?);
 
 """;
+
+public static final String FIND_TOTAL_TRADES_BY_ACCOUNTID_AND_SYMBOL ="SELECT COUNT(*) FROM trades WHERE symbol = ? AND account_id = ?";
+
+
+public static final String ADD_CASH_TO_ACCOUNT_BY_ACCOUNTID ="UPDATE accounts SET cash = cash + ? WHERE account_id = ?";
+
+
+public static final String DELETE_UNITS_FROM_PORTFOLIO_BY_ACCOUNTID_AND_SYMBOL ="UPDATE portfolio SET units = units - ? WHERE symbol = ? AND account_id = ?";
 
 
 
