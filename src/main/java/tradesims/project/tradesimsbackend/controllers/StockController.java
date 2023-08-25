@@ -230,7 +230,6 @@ public class StockController {
         
             Portfolio portfolio = stockSvc.getPortfolioData(accountId, symbol, interval);
 
-
             //save portfolio data in redis/mongo for quick retrieval
             // stockSvc.saveStockData(stock, interval);
 
@@ -262,7 +261,6 @@ public class StockController {
     }
 
 
-    
     @GetMapping(path="/allTrades")
     @ResponseBody
     public ResponseEntity<String> getAllTradesData(

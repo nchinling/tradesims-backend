@@ -27,7 +27,7 @@ CREATE TABLE trades (
     units NUMERIC(15,2),
     action VARCHAR(10), 
     trade_date DATE,
-    price NUMERIC(8,2),
+    price NUMERIC(8,4),
     currency VARCHAR(10),
     total NUMERIC(15,2),
     FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) ON DELETE CASCADE

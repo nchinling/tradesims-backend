@@ -8,16 +8,29 @@ public class DBQueries {
 
   """;
 
+// public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
+//     SELECT t.account_id, t.symbol, t.username, t.exchange, t.stock_name,
+//     t.currency, SUM(t.units*t.price)/SUM(t.units) as buy_price, 
+//     SUM(t.total) AS total_sum, SUM(t.units) AS total_units 
+//     FROM trades AS t
+//     RIGHT JOIN portfolio AS p ON t.portfolio_id = p.id
+//     WHERE t.account_id = ? AND t.symbol = ? 
+//     GROUP BY t.account_id, t.symbol, t.username, t.exchange, t.stock_name, t.currency
+//     ORDER BY t.symbol
+// """;
+
 public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
     SELECT t.account_id, t.symbol, t.username, t.exchange, t.stock_name,
-    t.currency, SUM(t.units*t.price)/SUM(t.units) as buy_price, 
+    t.currency, SUM(CASE WHEN t.action = "Buy" THEN t.units * t.price ELSE 0 END)/
+    SUM(CASE WHEN t.action = "Buy" THEN t.units ELSE 0 END) as buy_price, 
     SUM(t.total) AS total_sum, SUM(t.units) AS total_units 
     FROM trades AS t
     RIGHT JOIN portfolio AS p ON t.portfolio_id = p.id
-    WHERE t.account_id = ? AND t.symbol = ?
+    WHERE t.account_id = ? AND t.symbol = ? 
     GROUP BY t.account_id, t.symbol, t.username, t.exchange, t.stock_name, t.currency
     ORDER BY t.symbol
 """;
+
 
   public static final String SELECT_ACCOUNT_BY_EMAIL ="select * from accounts where email = ?";
     
@@ -25,7 +38,11 @@ public static final String SELECT_TRADE_BY_ACCOUNTID_AND_SYMBOL = """
 
   public static final String SELECT_SYMBOLS_BY_ACCOUNTID = "SELECT symbol FROM portfolio WHERE account_id = ?";
 
-  public static final String SELECT_TRADES_BY_ACCOUNTID = "SELECT * FROM trades WHERE account_id = ? ORDER BY symbol";
+  public static final String SELECT_TRADES_BY_ACCOUNTID = "SELECT * FROM trades WHERE account_id = ? ORDER BY trade_date DESC";
+
+  public static final String SELECT_UNITS_LEFT_USING_ACCOUNTID_AND_SYMBOL = "SELECT units WHERE account_id = ? AND symbol = ?";
+
+  public static final String DELETE_ROW_FROM_PORTFOLIO_BY_ACCOUNTID = "DELETE FROM portfolio WHERE account_id = ? AND symbol = ?";
 
   public static final String SELECT_TOTAL_UNITS_BY_ACCOUNTID_AND_SYMBOL = "SELECT units FROM portfolio WHERE account_id = ? AND symbol = ?";
 

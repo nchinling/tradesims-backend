@@ -248,10 +248,12 @@ public class AccountController {
     @ResponseBody
     public ResponseEntity<String> deleteFromPortfolio(@RequestBody Trade deleteTradeJson) {
 
+
     System.out.println(">>>>The symbol received is>>>" + deleteTradeJson.getSymbol() );
     System.out.println(">>>>The accountId received is>>>" + deleteTradeJson.getAccountId());
     System.out.println(">>>>The date received for delete is>>>" + deleteTradeJson.getDate());
-    // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+   
+
     // Date date;
     JsonObject resp= null;
         // date = dateFormat.parse(sellDataJson.getDate());

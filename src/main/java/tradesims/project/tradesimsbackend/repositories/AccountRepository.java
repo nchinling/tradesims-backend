@@ -104,16 +104,24 @@ public class AccountRepository {
         Double totalUnits=jdbcTemplate.queryForObject(SELECT_TOTAL_UNITS_BY_ACCOUNTID_AND_SYMBOL,Double.class, tradeToSell.getAccountId(), tradeToSell.getSymbol());
        
         if (totalUnits < tradeToSell.getUnits()){
-
+            throw new IllegalStateException("Not enough units to sell.");
         }
         else{
 
             jdbcTemplate.update(DELETE_UNITS_FROM_PORTFOLIO_BY_ACCOUNTID_AND_SYMBOL, tradeToSell.getUnits(), tradeToSell.getSymbol(), tradeToSell.getAccountId());
             jdbcTemplate.update(ADD_CASH_TO_ACCOUNT_BY_ACCOUNTID, tradeToSell.getUnits()*tradeToSell.getPrice(), tradeToSell.getAccountId());
+            Double unitsLeft=jdbcTemplate.queryForObject(SELECT_TOTAL_UNITS_BY_ACCOUNTID_AND_SYMBOL,Double.class, tradeToSell.getAccountId(), tradeToSell.getSymbol());
+            System.out.println(">>>unitsLeft is " + unitsLeft);
+       
             String portfolioId = jdbcTemplate.queryForObject(SELECT_PORTFOLIO_ID, String.class, tradeToSell.getAccountId(), tradeToSell.getSymbol());
             jdbcTemplate.update(INSERT_TRADE, portfolioId, tradeToSell.getAccountId(), tradeToSell.getUsername(), 
                                 tradeToSell.getExchange(), tradeToSell.getSymbol(), tradeToSell.getStockName(),
                                 tradeToSell.getUnits(), tradeToSell.getAction(), tradeToSell.getDate(), tradeToSell.getPrice(),tradeToSell.getCurrency(),tradeToSell.getUnits()*tradeToSell.getPrice());
+            
+            // if (unitsLeft == 0){
+            //     jdbcTemplate.update(DELETE_ROW_FROM_PORTFOLIO_BY_ACCOUNTID, tradeToSell.getAccountId(), tradeToSell.getSymbol());
+            // }
+            
         }
 
         return tradeToSell;

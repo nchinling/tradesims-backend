@@ -1,11 +1,8 @@
 package tradesims.project.tradesimsbackend.services;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -216,29 +213,43 @@ public Portfolio getPortfolioData(String accountId, String symbol, String interv
     Trade trade = t.get();
     Double totalUnits = accountRepo.getTotalUnits(accountId, symbol);
 
-    Stock stock;
-        s = getLivePrice(symbol, interval);
-        stock = s.get();
-    trade.setTotal(totalUnits*stock.getLivePrice());
+    if(totalUnits == 0){
+        Portfolio p = new Portfolio(trade.getAccountId(), trade.getSymbol(), trade.getStockName(),
+        trade.getExchange(), trade.getCurrency(), totalUnits, trade.getPrice(), totalUnits*trade.getPrice(),
+        0.0, 0.0, 
+        0.0, 0.0, LocalDate.now());
+        return p;
+   
+    }
+    else{
+   Stock stock;
+    s = getLivePrice(symbol, interval);
+    stock = s.get();
+    System.out.println("The live price is " + stock.getLivePrice());
 
-    Portfolio calculatedP = getCalculations(totalUnits, stock.getLivePrice(),trade.getTotal());
+    Portfolio calculatedP = getCalculations(totalUnits, stock.getLivePrice(),totalUnits*trade.getPrice());
     System.out.println(">>>>The total percentage change is >>>>>" + calculatedP.getTotalPercentageChange() );
     Portfolio p = new Portfolio(trade.getAccountId(), trade.getSymbol(), trade.getStockName(),
-                    trade.getExchange(), trade.getCurrency(), totalUnits, trade.getPrice(),trade.getTotal(),
-                    stock.getLivePrice(), calculatedP.getTotalCurrentPrice(), 
-                    calculatedP.getTotalReturn(), calculatedP.getTotalPercentageChange(), LocalDate.now()  );
-        System.out.println(">>> The stock price is>>>" + stock.getLivePrice());
+    trade.getExchange(), trade.getCurrency(), totalUnits, trade.getPrice(), totalUnits*trade.getPrice(),
+    stock.getLivePrice(), calculatedP.getTotalCurrentPrice(), 
+    calculatedP.getTotalReturn(), calculatedP.getTotalPercentageChange(), LocalDate.now()  );
+    System.out.println(">>> The stock price is>>>" + stock.getLivePrice());
 
     return p;
+ 
+
+    }
     
 }
 
     private Portfolio getCalculations(Double units, Double currentUnitPrice, Double totalBuyPrice){
-
+        System.out.println("The current unit price is " + currentUnitPrice);
         Double totalCurrentPrice = units*currentUnitPrice; 
         Double totalReturn = totalCurrentPrice - totalBuyPrice;
         Double totalPercentageChange = (totalReturn/totalBuyPrice)*100;
-
+        System.out.println("The total current price is " + totalCurrentPrice);
+        System.out.println("The total buy price is " + totalBuyPrice);
+        
         Portfolio p = new Portfolio(totalCurrentPrice, totalReturn, totalPercentageChange);
         return p;
     }
@@ -262,11 +273,9 @@ public Portfolio getPortfolioData(String accountId, String symbol, String interv
     }
 
 
-
-    
     public List<Trade> getAllTradesData(String accountId) throws IOException {
         System.out.println(">>>>>>>> I am in getPortfolioDataService>>>>>>");
-        Optional<Stock> s;
+        // Optional<Stock> s;
      
         List<Trade> allTrades = stockRepo.getAllTradesData(accountId);
 
