@@ -1,8 +1,6 @@
 package tradesims.project.tradesimsbackend.controllers;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,7 +51,6 @@ public class AccountController {
         String password = form.getFirst("password");
 
         System.out.printf(">>> I am inside Controller Login >>>>>\n");
-        // System.out.printf(">>> The key is >>>>>\n" + twelveDataWebSocketApiKey);
         JsonObject resp = null;
 
             Account loggedInAccount;

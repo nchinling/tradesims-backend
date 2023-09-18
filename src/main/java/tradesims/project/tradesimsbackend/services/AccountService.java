@@ -44,16 +44,13 @@ public class AccountService {
 
         @Transactional(rollbackFor = AccountException.class)
         public Account retrieveAccount(String username) throws AccountException {
-            // try {
+        
         
                 Optional<Account> retrievedAccount = accountRepo.getAccountByUsername(username);
 
                 return retrievedAccount.get();
 
-            // } catch (DataIntegrityViolationException ex) {
-            //     String errorMessage = "Error in retrieving account.";
-            //     throw new AccountException(errorMessage);
-            // }
+  
         }
 
 
@@ -68,10 +65,12 @@ public class AccountService {
                 return loggedInAccount;
             }
             else{
+              
                 throw new AccountNotFoundException("Password is incorrect");
             }
 
         } else {
+          
             throw new AccountNotFoundException("Account not found for email: " + email);
         }
     }
